@@ -1,0 +1,108 @@
+{
+  "publisher": "kevinamick",
+  "name": "code-responder",
+  "displayName": "code-responder",
+  "description": "Allows you to return files from your local disk instead of transmitting the request to the server",
+  "icon": "images/icon.jpg",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kevinamick/code-responder"
+  },
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.84.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "code-responder.startCapture",
+        "title": "Start Capturing"
+      },
+      {
+        "command": "code-responder.stopCapture",
+        "title": "Stop Capturing"
+      },
+      {
+        "command": "code-responder.changeBrowser",
+        "title": "Change Browser"
+      },
+      {
+        "command": "code-responder.addRule",
+        "title": "Add Rule"
+      },
+      {
+        "command": "code-responder.viewRules",
+        "title": "View Rules"
+      },
+      {
+        "command": "code-responder.addFile",
+        "title": "Add a Code-Responder Rule"
+      }
+    ],
+    "configuration": [
+      {
+        "title": "code-responder",
+        "properties": {
+          "coderesponder.proxyPort": {
+            "type": "number",
+            "default": 8000,
+            "description": "Set the port the code responder proxy will start on."
+          },
+          "coderesponder.profileDestination": {
+            "type": "string",
+            "default": "C:\\\\code-responder-profile",
+            "description": "Set where the code responder profile will be stored.",
+            "patternProperties": {
+              "^[a-zA-Z]:\\\\": {
+                "type": "string",
+                "description": "A valid windows path"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "code-responder.addFile",
+          "group": "navigation@1"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.6",
+    "@types/node": "18.x",
+    "@types/vscode": "^1.84.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.1",
+    "@typescript-eslint/parser": "^6.13.1",
+    "@vscode/test-cli": "^0.0.4",
+    "@vscode/test-electron": "^2.3.8",
+    "eslint": "^8.54.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.2",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "mockttp": "^3.9.4",
+    "stream-wrap": "^0.0.1"
+  }
+}
