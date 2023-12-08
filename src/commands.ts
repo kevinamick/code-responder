@@ -1,7 +1,9 @@
 import * as mockttp from 'mockttp';
 import * as vscode from 'vscode';
-import { deleteQuickPickItem, registerRules } from './utils';
-import { BROWSER_OPTIONS, DEFAULT_BROWSER } from './constants';
+import { deleteQuickPickItem, getSlash, registerRules } from './utils';
+import { BROWSER_OPTIONS, DEFAULT_BROWSER, RULES_FILE_NAME } from './constants';
+import { homedir } from 'os';
+import { onEditListener, onEditorCloseListener } from './listeners';
 
 export type Rule = { request: string, filePath: string };
 
@@ -121,6 +123,25 @@ export const AddRule = (rules: Array<Rule>,
     };
 };
 
+export const EditRules = (context: vscode.ExtensionContext): () => void => {
+    return async () => {
+        const rules: Array<Rule> = context.globalState.get('rules') || [];
+		const wsedit = new vscode.WorkspaceEdit();
+		const slash = getSlash();
+		const filePath = vscode.Uri.file(`${homedir()}${slash}.vscode${slash}${RULES_FILE_NAME}`);
+		wsedit.createFile(filePath, { overwrite: true });
+		wsedit.insert(filePath, new vscode.Position(0, 0), rules.map(rule => `${rule.request} ${rule.filePath}`).join('\n'));
+		await vscode.workspace.applyEdit(wsedit);
+
+        const disposable = onEditListener(context);
+		vscode.workspace.openTextDocument(filePath).then(doc => {
+			vscode.window.showTextDocument(doc).then(editor => {                
+				onEditorCloseListener(filePath, disposable);
+			});
+		});
+    };
+};
+
 export const ViewRules = (context: vscode.ExtensionContext,
     createQuickPick: () => vscode.QuickPick<vscode.QuickPickItem>): () => vscode.QuickPick<vscode.QuickPickItem> => {
 
@@ -128,9 +149,10 @@ export const ViewRules = (context: vscode.ExtensionContext,
         let rules: Array<Rule> = context.globalState.get('rules') || [];
         let options: Array<vscode.QuickPickItem> = rules.map(rule => {
             return {
-                label: `${rule.request}: ${rule.filePath}`,
+                label: `Request: ${rule.request} File: ${rule.filePath}`,
                 value: rule.filePath,
                 buttons: [{ iconPath: new vscode.ThemeIcon('trash'), tooltip: 'Delete rule' }],
+                
             };
         });
 

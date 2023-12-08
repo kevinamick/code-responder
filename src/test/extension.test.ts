@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as vscode from 'vscode';
 import { AddFile, AddRule, ChangeBrowser, Rule, ViewRules } from '../commands';
-import { deleteQuickPickItem } from '../utils';
+import { deleteQuickPickItem, getSlash } from '../utils';
 
 let context: vscode.ExtensionContext;
 
@@ -62,7 +62,7 @@ suite('Extension Test Suite', () => {
 		context.globalState.update('rules', [{ request: '*/index.js', filePath: 'test' }]);	
 		const quickPick = ViewRules(context, stub.createQuickPick)();
 		assert.equal(quickPick.items.length, 1);
-		assert.equal(quickPick.items[0].label, '*/index.js: test');
+		assert.equal(quickPick.items[0].label, 'Request: */index.js File: test');
 	});
 
 	test('View rules should remove a rule when the delete button is clicked', async () => {
@@ -71,7 +71,7 @@ suite('Extension Test Suite', () => {
 
 		let options: Array<vscode.QuickPickItem> = rules.map(rule => {
 			return {
-				label: `${rule.request}: ${rule.filePath}`,
+				label: `Request: ${rule.request} File: ${rule.filePath}`,
 				value: rule.filePath,
 				buttons: [{ iconPath: new vscode.ThemeIcon('trash'), tooltip: 'Delete rule' }],
 			};
@@ -84,12 +84,8 @@ suite('Extension Test Suite', () => {
 
 	test('Add file should add a rule for selected file', async () => {
 		const rules = await AddFile(stub.showInputBox, [], vscode.Uri.file('test'))();
-		assert.equal(rules.length, 1);
-
-		if(process.platform === 'linux' || process.platform === 'darwin') {
-			assert.equal(`${rules[0].request}:${rules[0].filePath}`, '\\/index\\.js$:/test');
-		} else {
-			assert.equal(`${rules[0].request}:${rules[0].filePath}`, '\\/index\\.js$:\\test');
-		}		
+		const slash = getSlash();
+		assert.equal(rules.length, 1);					
+		assert.equal(`${rules[0].request}:${rules[0].filePath}`, `\\/index\\.js$:${slash}test`);		
 	});
 });

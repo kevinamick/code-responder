@@ -1,5 +1,8 @@
 import * as vscode from 'vscode';
-import { AddFile, AddRule, ChangeBrowser, ResetCapture, Rule, StartCapture, StopCapture, ViewRules } from './commands';
+import { AddFile, AddRule, ChangeBrowser, EditRules, ResetCapture, Rule, StartCapture, StopCapture, ViewRules } from './commands';
+import { homedir } from 'os';
+import { RULES_FILE_NAME } from './constants';
+import { getSlash, isValidRule } from './utils';
 const exec = require('child_process').exec;
 
 export function activate(context: vscode.ExtensionContext) {
@@ -20,6 +23,8 @@ export function activate(context: vscode.ExtensionContext) {
 		await ResetCapture(rules);
 	});
 
+	const editRules = vscode.commands.registerCommand('code-responder.editRules', EditRules(context));
+
 	const viewRules = vscode.commands.registerCommand('code-responder.viewRules', async () => {
 		await ViewRules(context, vscode.window.createQuickPick)();
 	});
@@ -34,7 +39,7 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.showInformationMessage(`Rule for file ${fileUri.fsPath} added successfully`);
 	});
 
-	context.subscriptions.push(startCapture, changeBrowser, stopCapture, addRule, viewRules, addFile);
+	context.subscriptions.push(startCapture, changeBrowser, stopCapture, addRule, editRules, viewRules, addFile);
 
 	return context;
 }
