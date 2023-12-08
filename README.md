@@ -30,6 +30,12 @@ View rules by selecting "View Rules" in the Command Palette.
 
 You can delete rules from here by clicking the trash icon on the right.
 
+### Edit Rules
+
+All of the above can be done with this command. Select "Edit Rules" in the Command Palette and a file will be opened with the current rules. Simply add a new rule on the next line with request first, a space, and finally file. Or you can delete a line to remove that rule.
+
+![Edit Rules](images/EditRules.gif)
+
 ### Change Browser
 
 The default browser is set to msedge but you can switch to chrome by selecting "Change Browser" in the Command Palette.
