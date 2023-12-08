@@ -1,11 +1,7 @@
 import * as assert from 'assert';
-
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
 import * as vscode from 'vscode';
 import { AddFile, AddRule, ChangeBrowser, Rule, ViewRules } from '../commands';
 import { deleteQuickPickItem } from '../utils';
-// import * as myExtension from '../../extension';
 
 let context: vscode.ExtensionContext;
 
@@ -89,6 +85,11 @@ suite('Extension Test Suite', () => {
 	test('Add file should add a rule for selected file', async () => {
 		const rules = await AddFile(stub.showInputBox, [], vscode.Uri.file('test'))();
 		assert.equal(rules.length, 1);
-		assert.equal(`${rules[0].request}:${rules[0].filePath}`, '\\/index\\.js$:\\test');
+
+		if(process.platform === 'linux' || process.platform === 'darwin') {
+			assert.equal(`${rules[0].request}:${rules[0].filePath}`, '\\/index\\.js$:/test');
+		} else {
+			assert.equal(`${rules[0].request}:${rules[0].filePath}`, '\\/index\\.js$:\\test');
+		}		
 	});
 });
